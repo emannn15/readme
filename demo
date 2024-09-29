@@ -1,0 +1,34 @@
+import threading
+import time
+
+class Process(threading.Thread):
+    def __init__(self, id, burst_time, priority):
+        # Initialize process with ID, burst time, priority, and completion status
+        super().__init__()
+        self.id, self.burst_time, self.priority, self.completed = id, burst_time, priority, False
+
+    def run(self):
+        # Simulate process work by sleeping for burst_time and then mark as completed
+        time.sleep(self.burst_time)
+        self.completed = True
+        print(f"Process ID: {self.id} completed execution.")
+
+def schedule_processes(processes):
+    # Start all process threads
+    for p in processes:
+        p.start()
+    
+    # Scheduler loop to check priorities and execute processes
+    while processes:
+        p = max(processes, key=lambda p: p.priority)  # Select the process with the highest priority
+        
+        if p.completed:
+            processes.remove(p)  # Remove completed process
+        else:  # Run the highest priority process and increase its priority
+            print(f"Running process ID: {p.id} (Priority: {p.priority})")
+            p.priority += 1
+            
+        time.sleep(1)  # Simulate time passing between scheduling decisions
+
+# Define and schedule processes
+schedule_processes([Process(1, 4, 1), Process(2, 3, 2), Process(3, 2, 1)])
